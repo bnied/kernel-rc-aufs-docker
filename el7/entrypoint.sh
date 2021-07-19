@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 
-set -x
+set -euo pipefail
 
 # Set our base kernel version from the full version
 IFS='.' read -r -a VERSION_ARRAY <<< $KERNEL_FULL_VERSION
 KERNEL_BASE_VERSION="${VERSION_ARRAY[0]}.${VERSION_ARRAY[1]}"
 
 # Set our RC version
-RC_VERSION=`cat /opt/kernel-rc-aufs/specs-el7/kernel-rc-aufs-$KERNEL_BASE_VERSION.spec | grep "%define LKRCver" | awk '{print $3}'`
+RC_VERSION=$(grep '%define LKRCver' "/opt/kernel-rc-aufs/specs-el7/kernel-rc-aufs-$KERNEL_BASE_VERSION.spec" | awk '{print $3}')
 
 # Make sure we have the latest code
 cd /opt/kernel-rc-aufs
@@ -18,10 +18,7 @@ cd /opt/kernel-rc-aufs/specs-el7/
 yum-builddep -y kernel-rc-aufs-$KERNEL_BASE_VERSION.spec
 
 cd /opt/kernel-rc-aufs/
-mkdir -p /root/rpmbuild/SOURCES
-mkdir /root/rpmbuild/SPECS
-mkdir /root/rpmbuild/RPMS
-mkdir /root/rpmbuild/SRPMS
+mkdir -p /root/rpmbuild/{SOURCES,SPECS,RPMS,SRPMS}
 
 cp configs-el7/config-$KERNEL_FULL_VERSION* /root/rpmbuild/SOURCES/
 cp configs-el7/cpupower.* /root/rpmbuild/SOURCES/
@@ -31,7 +28,8 @@ cd /root/rpmbuild/SOURCES/
 git clone git://github.com/sfjro/aufs5-standalone.git -b aufs5.x-rcN aufs-standalone
 
 cd /root/rpmbuild/SOURCES/aufs-standalone
-export HEAD_COMMIT=$(git rev-parse --short HEAD); git archive $HEAD_COMMIT > ../aufs-standalone.tar
+HEAD_COMMIT=$(git rev-parse --short HEAD)
+git archive $HEAD_COMMIT > ../aufs-standalone.tar
 
 cd /root/rpmbuild/SOURCES/
 rm -rf aufs-standalone
@@ -42,8 +40,6 @@ rpmbuild -bs kernel-rc-aufs-$KERNEL_BASE_VERSION.spec
 
 cd /root/rpmbuild/SRPMS/
 rpmbuild --rebuild kernel-rc-aufs-$KERNEL_FULL_VERSION.$RC_VERSION-$RELEASE_VERSION.el7.src.rpm
-
-mkdir -p /root/rc
 
 mkdir -p /root/rc/SRPMS
 cp -av /root/rpmbuild/SRPMS/* /root/rc/SRPMS/
