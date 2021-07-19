@@ -43,8 +43,8 @@ rpmbuild -bs kernel-rc-aufs-$KERNEL_BASE_VERSION.spec
 cd /root/rpmbuild/SRPMS/
 rpmbuild --rebuild kernel-rc-aufs-$KERNEL_FULL_VERSION.$RC_VERSION-$RELEASE_VERSION.el7.src.rpm
 
-mkdir -p /root/ml
+mkdir -p /root/rc
 
-mkdir -p /root/ml/SRPMS
-cp -av /root/rpmbuild/SRPMS/* /root/ml/SRPMS/
-cp -av /root/rpmbuild/RPMS/* /root/ml/
+mkdir -p /root/rc/SRPMS
+cp -av /root/rpmbuild/SRPMS/* /root/rc/SRPMS/
+cp -av /root/rpmbuild/RPMS/* /root/rc/
