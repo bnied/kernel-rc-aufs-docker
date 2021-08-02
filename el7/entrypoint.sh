@@ -6,12 +6,12 @@ set -euo pipefail
 IFS='.' read -r -a VERSION_ARRAY <<< $KERNEL_FULL_VERSION
 KERNEL_BASE_VERSION="${VERSION_ARRAY[0]}.${VERSION_ARRAY[1]}"
 
-# Set our RC version
-RC_VERSION=$(grep '%define LKRCver' "/opt/kernel-rc-aufs/specs-el7/kernel-rc-aufs-$KERNEL_BASE_VERSION.spec" | awk '{print $3}')
-
 # Make sure we have the latest code
 cd /opt/kernel-rc-aufs
 git pull
+
+# Set our RC version
+RC_VERSION=$(grep '%define LKRCver' "/opt/kernel-rc-aufs/specs-el7/kernel-rc-aufs-$KERNEL_BASE_VERSION.spec" | awk '{print $3}')
 
 cd /opt/kernel-rc-aufs/specs-el7/
 
